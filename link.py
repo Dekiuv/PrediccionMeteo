@@ -1,10 +1,14 @@
-import sqlite3
-import numpy as np
 import pandas as pd
+import numpy as np
+import sqlite3
+import streamlit as st
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 # Función para cargar datos desde la base de datos
 def load_data_from_db(db_path, table_name):
@@ -12,96 +16,91 @@ def load_data_from_db(db_path, table_name):
     query = f"SELECT * FROM {table_name}"
     df = pd.read_sql_query(query, conn)
     conn.close()
-    return df  # Devuelve el DataFrame
+    return df
 
-# Función principal para entrenar SVM y hacer predicciones
-def main():
-    # Parámetros de la base de datos
-    db_path = "CSV/observations.db"  # Ruta de la base de datos
-    table_name = "weather_data"      # Nombre de la tabla
+# Título de la aplicación
+st.title("Predicción Meteorológica Mejorada con Variables Balanceadas")
 
-    # Cargar los datos desde la base de datos
-    print("Cargando los datos desde la base de datos...")
+# Parámetros de entrada
+st.sidebar.header("Parámetros de Entrada")
+db_path = st.sidebar.text_input("Ruta de la base de datos", "CSV/observations.db")
+table_name = st.sidebar.text_input("Nombre de la tabla", "weather_data")
+
+# Botón para cargar los datos
+if st.sidebar.button("Cargar Datos"):
     try:
+        # Cargar datos
         df = load_data_from_db(db_path, table_name)
+        st.write("### Datos Cargados")
+        st.write(df.head())
+
+        # Verificar distribución de valores categóricos
+        st.write("### Distribución de Clases Categóricas")
+        st.write(df['weather_id'].value_counts())
+
+        # Transformar variables categóricas con One-Hot Encoding
+        df_encoded = pd.get_dummies(df, columns=['weather_id', 'cloudiness_id', 'estacion_id'], drop_first=True)
+
+        # Variables predictoras y objetivo
+        features = ['precipitation', 'temp_min', 'wind', 'humidity', 'pressure', 'solar_radiation', 'visibility']
+        features += [col for col in df_encoded.columns if 'weather_id' in col or 'cloudiness_id' in col or 'estacion_id' in col]
+        target = 'temp_max'
+
+        X = df_encoded[features]
+        y = df_encoded[target]
+
+        # Normalizar datos
+        scaler_X = MinMaxScaler()
+        scaler_y = MinMaxScaler()
+        X_scaled = scaler_X.fit_transform(X)
+        y_scaled = scaler_y.fit_transform(y.values.reshape(-1, 1)).ravel()
+
+        # División de datos
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.2, random_state=42)
+
+        # Entrenar modelos
+        st.write("### Comparación de Modelos")
+
+        # Random Forest
+        rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+        rf_model.fit(X_train, y_train)
+        rf_pred = rf_model.predict(X_test)
+
+        # XGBoost
+        xgb_model = XGBRegressor(n_estimators=100, random_state=42)
+        xgb_model.fit(X_train, y_train)
+        xgb_pred = xgb_model.predict(X_test)
+
+        # Desnormalizar para métricas y visualización
+        y_test_real = scaler_y.inverse_transform(y_test.reshape(-1, 1)).ravel()
+        rf_pred_real = scaler_y.inverse_transform(rf_pred.reshape(-1, 1)).ravel()
+        xgb_pred_real = scaler_y.inverse_transform(xgb_pred.reshape(-1, 1)).ravel()
+
+        # Función para mostrar métricas
+        def show_metrics(model_name, y_true, y_pred):
+            mae = mean_absolute_error(y_true, y_pred)
+            rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+            r2 = r2_score(y_true, y_pred)
+            st.write(f"**{model_name}**")
+            st.write(f"- MAE: {mae:.4f}")
+            st.write(f"- RMSE: {rmse:.4f}")
+            st.write(f"- R²: {r2:.4f}")
+
+        # Mostrar métricas
+        show_metrics("Random Forest", y_test_real, rf_pred_real)
+        show_metrics("XGBoost", y_test_real, xgb_pred_real)
+
+        # Gráfico comparativo
+        st.write("### Comparación de Valores Reales y Predichos")
+        fig, ax = plt.subplots()
+        ax.plot(y_test_real, label="Valores Reales", color="blue")
+        ax.plot(rf_pred_real, label="Random Forest", color="green", linestyle="--")
+        ax.plot(xgb_pred_real, label="XGBoost", color="red", linestyle="--")
+        ax.set_title("Valores Reales vs Predichos")
+        ax.set_xlabel("Muestras")
+        ax.set_ylabel("Temperatura Máxima (°C)")
+        ax.legend()
+        st.pyplot(fig)
+
     except Exception as e:
-        print(f"Error al cargar los datos: {e}")
-        return
-
-    # Verificar las columnas necesarias
-    required_columns = ['precipitation', 'temp_max', 'temp_min']
-    if not all(col in df.columns for col in required_columns):
-        print(f"Error: La tabla debe contener las columnas {required_columns}")
-        return
-
-    # Calcular probabilidad de precipitación
-    precip_threshold = 50  # Umbral máximo de precipitación en mm
-    df['precip_probability'] = (df['precipitation'] / precip_threshold) * 100
-    df['precip_probability'] = df['precip_probability'].clip(0, 100)  # Limitar al 100%
-
-    # Seleccionar características y objetivos
-    X = df['precipitation'].values.reshape(-1, 1)  # Predictor: 'precipitation'
-    y_max = df['temp_max'].values  # Objetivo: temperatura máxima
-    y_min = df['temp_min'].values  # Objetivo: temperatura mínima
-    y_prob = df['precip_probability'].values  # Objetivo: % de precipitación
-
-    # Normalizar los datos
-    scaler_X = MinMaxScaler()
-    scaler_y_max = MinMaxScaler()
-    scaler_y_min = MinMaxScaler()
-    scaler_y_prob = MinMaxScaler()
-
-    X_scaled = scaler_X.fit_transform(X)
-    y_max_scaled = scaler_y_max.fit_transform(y_max.reshape(-1, 1)).ravel()
-    y_min_scaled = scaler_y_min.fit_transform(y_min.reshape(-1, 1)).ravel()
-    y_prob_scaled = scaler_y_prob.fit_transform(y_prob.reshape(-1, 1)).ravel()
-
-    # Dividir los datos en entrenamiento y prueba
-    X_train, X_test, y_max_train, y_max_test = train_test_split(X_scaled, y_max_scaled, test_size=0.2, random_state=42)
-    _, _, y_min_train, y_min_test = train_test_split(X_scaled, y_min_scaled, test_size=0.2, random_state=42)
-    _, _, y_prob_train, y_prob_test = train_test_split(X_scaled, y_prob_scaled, test_size=0.2, random_state=42)
-
-    # Crear y entrenar tres modelos SVM
-    model_max = SVR(kernel='rbf', C=10, gamma='auto')
-    model_min = SVR(kernel='rbf', C=10, gamma='auto')
-    model_prob = SVR(kernel='rbf', C=10, gamma='auto')
-    model_max.fit(X_train, y_max_train)
-    model_min.fit(X_train, y_min_train)
-    model_prob.fit(X_train, y_prob_train)
-
-    # ------------------------
-    # Predicción para 7 días futuros
-    # ------------------------
-    print("Predicción de los próximos 7 días:")
-    future_precipitation = np.linspace(X.max(), X.max() + 7, 7).reshape(-1, 1)  # Generar 7 días ficticios de precipitación
-    future_precip_scaled = scaler_X.transform(future_precipitation)
-
-    # Predicción de temperaturas máximas, mínimas y % de precipitación
-    future_temp_max_scaled = model_max.predict(future_precip_scaled)
-    future_temp_min_scaled = model_min.predict(future_precip_scaled)
-    future_prob_scaled = model_prob.predict(future_precip_scaled)
-
-    future_temp_max = scaler_y_max.inverse_transform(future_temp_max_scaled.reshape(-1, 1))
-    future_temp_min = scaler_y_min.inverse_transform(future_temp_min_scaled.reshape(-1, 1))
-    future_prob = scaler_y_prob.inverse_transform(future_prob_scaled.reshape(-1, 1))
-
-    # Mostrar las predicciones
-    print("\nResultados:")
-    for i, (temp_max, temp_min, prob) in enumerate(zip(future_temp_max, future_temp_min, future_prob), 1):
-        print(f"Día {i}: Temperatura Máxima = {temp_max[0]:.2f}°C, Temperatura Mínima = {temp_min[0]:.2f}°C, "
-              f"Probabilidad de Precipitación = {prob[0]:.2f}%")
-
-    # Visualización de las predicciones futuras
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(1, 8), future_temp_max, marker='o', linestyle='-', label='Temperatura Máxima', color='r')
-    plt.plot(range(1, 8), future_temp_min, marker='o', linestyle='-', label='Temperatura Mínima', color='b')
-    plt.plot(range(1, 8), future_prob, marker='o', linestyle='--', label='% Precipitación', color='g')
-    plt.xlabel('Días Futuros')
-    plt.ylabel('Valores')
-    plt.title('Predicción de Temperatura Máxima, Mínima y % de Precipitación')
-    plt.legend()
-    plt.grid()
-    plt.show()
-
-if __name__ == "__main__":
-    main()
+        st.error(f"Error al cargar los datos: {e}")
