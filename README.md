@@ -1,10 +1,13 @@
 ﻿# Simulador de Predicción Meteorológica con Big Data 🌤️
 
-Este proyecto tiene como objetivo principal proporcionar un simulador de predicción meteorológica preciso y eficiente, aprovechando las capacidades de Big Data para gestionar grandes volúmenes de datos y realizar previsiones a corto plazo con alta precisión.
-
 ## Descripción
+Este proyecto tiene como objetivo desarrollar un simulador de predicción meteorológica que aprovecha el poder de Big Data y aprendizaje automático para predecir condiciones climáticas a corto plazo con alta precisión. Utilizamos:  
+- **Random Forest Regressor**🌲 de Scikit-learn para entrenar un modelo de predicción de temperatura y condiciones climáticas basado en características como temperatura máxima, mínima y   nubosidad.
+- **Label Encoding** 🔢 para transformar las etiquetas de clima y nubosidad en valores numéricos para su uso en el modelo.
+- **StandardScaler** ⚖️ para normalizar las características y mejorar la precisión del modelo de predicción.
+- **Métricas de rendimiento** 📈 como el Error Absoluto Medio (MAE), Error Cuadrático Medio (MSE) y R² para evaluar la efectividad del modelo.
 
-Se ha desarrollado un simulador de predicción meteorológica que integra, procesa y analiza grandes volúmenes de datos utilizando técnicas de Big Data. El simulador está diseñado para almacenar, gestionar, visualizar y realizar previsiones meteorológicas a corto plazo con alta precisión, brindando una herramienta robusta para prever condiciones climáticas en un futuro cercano.
+El enfoque principal de este simulador es predecir las condiciones meteorológicas futuras de manera precisa, lo que puede ser útil para diversas aplicaciones como la planificación de eventos, análisis de tendencias climáticas o gestión de recursos en función del clima.
 
 ## Tecnologias utilizadas 💻
 
@@ -15,7 +18,7 @@ Se ha desarrollado un simulador de predicción meteorológica que integra, proce
 - Plotly: Creación de gráficos interactivos y visualizaciones avanzadas en Python.
 - Streamlit: Herramienta para crear aplicaciones web interactivas y visualizaciones de datos de manera rápida.
 
-## Librerias y versiones necesarias ⚠️
+## Versiones necesarias ⚠️
 El proyecto utiliza las siguientes librerías y versiones específicas:  
       🐍 **Python** (3.11 o superior)    
       📚 **Pandas** (2.2.3)  
