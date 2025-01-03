@@ -1,6 +1,6 @@
 ﻿# Simulador de Predicción Meteorológica con Big Data 🌤️
 
-## Descripción
+## Descripción 📝
 Este proyecto tiene como objetivo desarrollar un simulador de predicción meteorológica que aprovecha el poder de Big Data y aprendizaje automático para predecir condiciones climáticas a corto plazo con alta precisión. Utilizamos:  
 - **Random Forest Regressor**🌲 de Scikit-learn para entrenar un modelo de predicción de temperatura y condiciones climáticas basado en características como temperatura máxima, mínima y nubosidad.
 - **Label Encoding** 🔢 para transformar las etiquetas de clima y nubosidad en valores numéricos para su uso en el modelo.
