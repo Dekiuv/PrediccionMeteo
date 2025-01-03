@@ -11,20 +11,20 @@ El enfoque principal de este simulador es predecir las condiciones meteorológic
 
 ## Tecnologías utilizadas 💻
 
-- Python: Lenguaje de programación principal.
-- Sqlite3: Base de datos ligera y autónoma para almacenamiento y manipulación de datos locales.
-- Pandas: Manejo y análisis de datos.
-- Scikit-learn: Aprendizaje automático para clasificación, regresión y clustering.
-- Plotly: Creación de gráficos interactivos y visualizaciones avanzadas en Python.
-- Streamlit: Herramienta para crear aplicaciones web interactivas y visualizaciones de datos de manera rápida.
+- **Python**: Lenguaje de programación principal.
+- **Sqlite3**: Base de datos ligera y autónoma para almacenamiento y manipulación de datos locales.
+- **Pandas**: Manejo y análisis de datos.
+- **Scikit-learn**: Aprendizaje automático para clasificación, regresión y clustering.
+- **Plotly**: Creación de gráficos interactivos y visualizaciones avanzadas en Python.
+- **Streamlit**: Herramienta para crear aplicaciones web interactivas y visualizaciones de datos de manera rápida.
 
 ## Versiones necesarias ⚠️
 El proyecto utiliza las siguientes librerías y versiones específicas:  
-      🐍 **Python** (3.11 o superior)    
-      📚 **Pandas** (2.2.3)  
-      📚 **Scikit-learn** (1.5.2)  
-      📚 **Plotly** (5.24.1)  
-      📚 **Streamlit** (1.41.1)  
+🐍 **Python** (3.11 o superior)    
+📚 **Pandas** (2.2.3)  
+📚 **Scikit-learn** (1.5.2)  
+📚 **Plotly** (5.24.1)  
+📚 **Streamlit** (1.41.1)  
 
 ## Instalación y ejecución 🚀
 
