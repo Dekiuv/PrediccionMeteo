@@ -44,4 +44,4 @@ El proyecto utiliza las siguientes librerías y versiones específicas:
 1. Para acceder al dashboard, copia el siguiente enlace en un navegador:
 
    ```bash
-   https://grupstucom-my.sharepoint.com/:u:/g/personal/st2022302_365_stucom_com/EUxtoQUX2uZKtyFb_w4W4-UByYxKS9lef9K4qjL-AZVSbw?e=wxYwTm
+   https://app.powerbi.com/links/KcWWxh5qoa?ctid=b597eb56-0622-442c-833d-8daf3dcaf56d&pbi_source=linkShare
