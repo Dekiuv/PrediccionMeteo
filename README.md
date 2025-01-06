@@ -38,3 +38,10 @@ El proyecto utiliza las siguientes librerías y versiones específicas:
 
    ```bash
    python3 -m streamlit run main.py
+
+## Dashboard con PowerBi 🖥️
+
+1. Para acceder al dashboard, copia el siguiente enlace en un navegador:
+
+   ```bash
+   https://grupstucom-my.sharepoint.com/:u:/g/personal/st2022302_365_stucom_com/EUxtoQUX2uZKtyFb_w4W4-UByYxKS9lef9K4qjL-AZVSbw?e=wxYwTm
