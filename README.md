@@ -45,3 +45,5 @@ El proyecto utiliza las siguientes librerías y versiones específicas:
 
    ```bash
    https://app.powerbi.com/links/KcWWxh5qoa?ctid=b597eb56-0622-442c-833d-8daf3dcaf56d&pbi_source=linkShare
+
+2. Si al abrir la página no se visualiza bien, se recomienda desampliar.
