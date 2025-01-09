@@ -3,6 +3,7 @@ import Entrenamiento as ent  # Libreria para la carga de datos y entrenamiento d
 import Grafica as graf  # Libreria para la creación de la gráfica
 import GradientBooster as gbc  # Importar la clase GradientBooster
 import pandas as pd
+from sklearn.metrics import classification_report
 
 # Configuración de la página
 st.set_page_config(
@@ -19,12 +20,12 @@ def main():
     db_path = "CSV/Prediccion.db"
 
     # Selección del modelo
-    modelo_seleccionado = st.selectbox("Selecciona el modelo de predicción", ["Random Forest", "Gradient Boosting (Clasificación)"])
+    modelo_seleccionado = st.selectbox("Selecciona el modelo de predicción", ["Random Forest", "Gradient Boosting"])
 
     if modelo_seleccionado == "Random Forest":
         simulador = ent.SimuladorMeteorologico(db_path)  # Clase de Random Forest
-    elif modelo_seleccionado == "Gradient Boosting (Clasificación)":
-        simulador = gbc.GradientBooster()  # Clase de Gradient Boosting para clasificación
+    elif modelo_seleccionado == "Gradient Boosting":
+        simulador = gbc.GradientBooster()  # Clase de Gradient Boosting
 
     # Cargar los datos de la base de datos
     df = simulador.cargar_datos()  # Cargar los datos de la base de datos
@@ -85,21 +86,41 @@ def main():
                                 mime="text/csv"
                             )
 
-                elif modelo_seleccionado == "Gradient Boosting (Clasificación)":
+                elif modelo_seleccionado == "Gradient Boosting":
                     y_test, y_pred, accuracy, report = simulador.entrenar_y_predecir(df_procesado, feature_columns, "weather")
 
-                    # Mostrar resultados de Gradient Boosting
-                    st.subheader("Resultados de la predicción")
-                    st.write(f"Precisión del modelo: {accuracy:.2f}")
-                    st.text("Reporte de clasificación:")
-                    st.text(report)
+                    with col2:
+                        # Mostrar resultados de Gradient Boosting
+                        st.markdown("## Resultados de la Predicción")
+                        st.markdown(f"### Precisión del Modelo: **{accuracy:.2f}**")
+                        def reporte_a_dataframe(report):
+                            report_dict = classification_report(y_test, y_pred, output_dict=True)
+                            df_report = pd.DataFrame(report_dict).transpose()
+                            return df_report
+                        st.markdown("### Reporte de Clasificación")
+                        df_report = reporte_a_dataframe(report)
+                        st.dataframe(df_report.style.format({"precision": "{:.2f}", "recall": "{:.2f}", "f1-score": "{:.2f}", "support": "{:.0f}"}))
 
-                    # Mostrar predicciones reales vs predichas
-                    predicciones_df = pd.DataFrame({
-                        "Real": y_test,
-                        "Predicción": y_pred
-                    })
-                    st.dataframe(predicciones_df)
+                        st.markdown("---")
+
+                        st.markdown("### Métricas Clave")
+                        col1, col2, col3 = st.columns(3)
+                        col1.metric(label="Precisión Promedio", value=f"{df_report.loc['macro avg', 'precision']:.2f}")
+                        col2.metric(label="Recall Promedio", value=f"{df_report.loc['macro avg', 'recall']:.2f}")
+                        col3.metric(label="F1-Score Promedio", value=f"{df_report.loc['macro avg', 'f1-score']:.2f}")
+
+                        st.markdown("---")
+
+                        st.markdown("### Predicciones Reales vs Predichas")
+                        df_predicciones = pd.DataFrame({
+                            "Real": y_test,
+                            "Predicción": y_pred
+                        })
+
+                        def resaltar_predicciones(val):
+                            return ['background-color: #31c852' if val['Real'] == val['Predicción'] else 'background-color: #e55361'] * len(val)
+
+                        st.dataframe(df_predicciones.style.apply(resaltar_predicciones, axis=1))
 
 # Llamada a la función principal
 if __name__ == "__main__":
