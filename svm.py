@@ -1,15 +1,15 @@
-import os  # Biblioteca para trabajar con variables de entorno
+import os
 import streamlit as st
 import pandas as pd
 import sqlite3
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.svm import SVR
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from imblearn.over_sampling import SMOTE
 
-# Configurar OMP_NUM_THREADS
-os.environ["OMP_NUM_THREADS"] = "4"  # Limitar OpenMP a 4 hilos
+# Configurar OMP_NUM_THREADS para optimizar el uso de CPU
+os.environ["OMP_NUM_THREADS"] = "4"
 
 # Función para cargar datos desde SQLite
 @st.cache_data
@@ -23,7 +23,7 @@ def cargar_datos():
     return df_valores
 
 # Función para optimizar hiperparámetros y entrenar el modelo
-def optimizar_y_predecir(df, tolerance=0.2):
+def optimizar_y_predecir(df, tolerance=0.2, subset_size=5000):
     feature_columns = ['precipitation', 'temp_max', 'temp_min', 'wind']  # Características
     target_column = 'weather_id'
 
@@ -33,9 +33,13 @@ def optimizar_y_predecir(df, tolerance=0.2):
     # Dividir los datos
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+    # Usar un subconjunto de datos para la búsqueda
+    X_train_subset = X_train[:subset_size]
+    y_train_subset = y_train[:subset_size]
+
     # Aplicar SMOTE
     smote = SMOTE(random_state=42)
-    X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_subset, y_train_subset)
 
     # Escalar los datos
     scaler = StandardScaler()
@@ -46,19 +50,19 @@ def optimizar_y_predecir(df, tolerance=0.2):
     model = SVR()
 
     # Definir el rango de hiperparámetros para optimizar
-    param_grid = {
+    param_distributions = {
         'kernel': ['rbf', 'linear'],  
-        'C': [0.1, 1, 10, 100, 1000], 
-        'gamma': ['scale', 'auto', 0.01, 0.1, 1, 10]
+        'C': [0.1, 1, 10, 100],      
+        'gamma': ['scale', 0.01, 0.1, 1]
     }
 
-    # Configurar GridSearchCV
-    grid_search = GridSearchCV(model, param_grid, cv=3, scoring='r2', verbose=2, n_jobs=-1)
-    grid_search.fit(X_train_scaled, y_train_resampled)
+    # Configurar RandomizedSearchCV
+    random_search = RandomizedSearchCV(model, param_distributions, n_iter=20, cv=3, scoring='r2', verbose=2, n_jobs=-1, random_state=42)
+    random_search.fit(X_train_scaled, y_train_resampled)
 
     # Mejor modelo encontrado
-    best_model = grid_search.best_estimator_
-    st.write(f"Mejores hiperparámetros: {grid_search.best_params_}")
+    best_model = random_search.best_estimator_
+    st.write(f"Mejores hiperparámetros: {random_search.best_params_}")
 
     # Entrenar y predecir con el mejor modelo
     y_pred = best_model.predict(X_test_scaled)
