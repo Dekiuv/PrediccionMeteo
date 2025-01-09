@@ -57,29 +57,35 @@ class SimuladorMeteorologico:
     from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score # Importar r2_score
 
     # Método para entrenar y predecir
-    def entrenar_y_predecir(self, df, feature_columns, target_columns, dias):
-        X = df[feature_columns].values # Características
-        y = df[target_columns].values # Objetivo
+    def entrenar_y_predecir(self, df, feature_columns, target_columns, dias, tolerance=0.5):
+        X = df[feature_columns].values  # Características
+        y = df[target_columns].values  # Objetivo
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) # División de datos en entrenamiento y prueba
-        scaler = StandardScaler() # Escalador estándar
-        X_train = scaler.fit_transform(X_train) # Escalar los datos de entrenamiento
-        X_test = scaler.transform(X_test) # Escalar los datos de prueba
+        # División de datos en entrenamiento y prueba
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        self.model.fit(X_train, y_train) # Entrenar el modelo
-        y_pred_test = self.model.predict(X_test) # Predecir en los datos de prueba
+        # Escalar los datos
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
 
-        mae_test = mean_absolute_error(y_test, y_pred_test) # Error absoluto medio
-        mse_test = mean_squared_error(y_test, y_pred_test) # Error cuadrático medio
-        r2_test = r2_score(y_test, y_pred_test) # R²
+        # Entrenar el modelo
+        self.model.fit(X_train, y_train)
+        y_pred_test = self.model.predict(X_test)  # Predicción en los datos de prueba
 
-        y_pred_test_mapped = pd.DataFrame(y_pred_test, columns=target_columns) # Crear un DataFrame con las predicciones
-        y_pred_test_mapped['weather'] = y_pred_test_mapped['weather'].apply(
-            lambda x: self.weather_mapping.get(max(1, min(5, int(x))), 'Unknown') # Mapear los valores de clima
-        )
-        y_pred_test_mapped['cloudiness'] = y_pred_test_mapped['cloudiness'].apply(
-            lambda x: self.cloudiness_mapping.get(max(1, min(3, int(x))), 'Unknown') # Mapear los valores de nubosidad
-        )
-        
-        y_pred_test_mapped_limited = y_pred_test_mapped.head(dias) # Limitar los resultados a los días seleccionados
-        return y_pred_test_mapped, y_pred_test_mapped_limited, mae_test, mse_test, r2_test
+        # Calcular métricas
+        mae_test = mean_absolute_error(y_test, y_pred_test)
+        mse_test = mean_squared_error(y_test, y_pred_test)
+        r2_test = r2_score(y_test, y_pred_test)
+
+        # Calcular accuracy basado en un margen de tolerancia
+        correct_predictions = (abs(y_test - y_pred_test) <= tolerance).all(axis=1).sum()
+        total_predictions = len(y_test)
+        accuracy = (correct_predictions / total_predictions) * 100  # Accuracy en %
+
+        # Crear un DataFrame con las predicciones
+        y_pred_test_mapped = pd.DataFrame(y_pred_test, columns=target_columns)
+
+        y_pred_test_mapped_limited = y_pred_test_mapped.head(dias)  # Limitar los resultados a los días seleccionados
+
+        return y_pred_test_mapped, y_pred_test_mapped_limited, mae_test, mse_test, r2_test, accuracy
