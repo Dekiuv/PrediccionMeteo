@@ -4,16 +4,16 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
+from imblearn.over_sampling import SMOTE  # Importar SMOTE para balancear las clases
 
-class GradientBooster:
+class GradientBoosterClassifier:
     def __init__(self):
-        # Inicializar el modelo Gradient Boosting para clasificación
+        # Inicializar el modelo Gradient Boosting
         self.model = GradientBoostingClassifier(
             random_state=42, n_estimators=100, max_depth=10, learning_rate=0.1
         )
-        # Inicializar el codificador de etiquetas para variables categóricas
-        self.label_encoder = LabelEncoder()
-        
+        self.label_encoder = LabelEncoder()  # Codificador para las clases categóricas
+    
     def cargar_datos(self):
         # Conectar a la base de datos SQLite
         connection = sqlite3.connect("CSV/Prediccion.db")
@@ -27,54 +27,50 @@ class GradientBooster:
         """
         # Cargar los datos de la base de datos
         df = pd.read_sql(query, connection)
-        # Eliminar columnas no necesarias
         df.drop(columns=['date_id', 'weather_id', 'cloudiness_id', 'estacion_id'], inplace=True)
-        # Reordenar columnas para una mejor presentación
         cols = ['date'] + [col for col in df.columns if col != 'date']
         df = df[cols]
-        connection.close()  # Cerrar la conexión a la base de datos
+        connection.close()  # Cerrar la conexión
         return df
     
     def procesar_datos(self, df):
-        # Trabajar con una copia del DataFrame para evitar modificar el original
+        # Crear una copia del DataFrame para evitar modificar el original
         df = df.copy()
-        # Codificar la columna 'weather' en valores numéricos
+        # Codificar variables categóricas
         df['weather_encoded'] = self.label_encoder.fit_transform(df['weather'])
-        # Codificar la columna 'cloudiness' en valores numéricos
         df['cloudiness'] = pd.Categorical(df['cloudiness']).codes
-        # Calcular el rango de temperatura (temp_max - temp_min)
+        # Crear una nueva característica: rango de temperatura
         df['temp_range'] = df['temp_max'] - df['temp_min']
         return df
 
     def entrenar_y_predecir(self, df, feature_columns, target_column):
-        # Seleccionar las características (X) y el objetivo codificado (y)
+        # Seleccionar características y objetivo
         X = df[feature_columns].values
-        y = df['weather_encoded']  # Usar la columna codificada para el clima
+        y = df['weather_encoded']  # Columna codificada como objetivo
 
-        # Dividir los datos en conjuntos de entrenamiento y prueba
+        # Dividir los datos en entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-        # Escalar las características para normalizar los valores
+
+        # Aplicar SMOTE para balancear las clases
+        smote = SMOTE(random_state=42)
+        X_train, y_train = smote.fit_resample(X_train, y_train)
+
+        # Escalar las características
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
 
         # Entrenar el modelo
         self.model.fit(X_train, y_train)
-        # Realizar predicciones sobre los datos de prueba
+
+        # Predicciones sobre el conjunto de prueba
         y_pred_test = self.model.predict(X_test)
 
-        # Obtener las clases originales de la columna 'weather'
-        weather_classes = df['weather'].unique().tolist()
-        
-        # Generar el reporte de clasificación
-        try:
-            report = classification_report(y_test, y_pred_test, target_names=weather_classes)
-        except Exception as e:
-            print(f"Error al generar el reporte de clasificación: {e}")
-            report = classification_report(y_test, y_pred_test)
+        # Generar reporte de clasificación
+        weather_classes = self.label_encoder.classes_  # Obtener las clases originales
+        report = classification_report(y_test, y_pred_test, target_names=weather_classes)
 
-        # Decodificar las etiquetas predichas y reales a los nombres originales
+        # Decodificar las predicciones para interpretación
         y_test_decoded = self.label_encoder.inverse_transform(y_test)
         y_pred_decoded = self.label_encoder.inverse_transform(y_pred_test)
 

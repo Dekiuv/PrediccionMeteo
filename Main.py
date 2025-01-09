@@ -1,6 +1,6 @@
-import streamlit as st  # Libreria para la creación de la interfaz
-import Entrenamiento as ent  # Libreria para la carga de datos y entrenamiento del modelo
-import Grafica as graf  # Libreria para la creación de la gráfica
+import streamlit as st  # Librería para la creación de la interfaz
+import Entrenamiento as ent  # Librería para la carga de datos y entrenamiento del modelo
+import Grafica as graf  # Librería para la creación de la gráfica
 import GradientBooster as gbc  # Importar la clase GradientBooster
 import pandas as pd
 from sklearn.metrics import classification_report
@@ -25,7 +25,7 @@ def main():
     if modelo_seleccionado == "Random Forest":
         simulador = ent.SimuladorMeteorologico(db_path)  # Clase de Random Forest
     elif modelo_seleccionado == "Gradient Boosting":
-        simulador = gbc.GradientBooster()  # Clase de Gradient Boosting
+        simulador = gbc.GradientBoosterClassifier()  # Clase de Gradient Boosting con SMOTE
 
     # Cargar los datos de la base de datos
     df = simulador.cargar_datos()  # Cargar los datos de la base de datos
@@ -93,11 +93,13 @@ def main():
                         # Mostrar resultados de Gradient Boosting
                         st.markdown("## Resultados de la Predicción")
                         st.markdown(f"### Precisión del Modelo: **{accuracy:.2f}**")
+                        st.markdown("### Reporte de Clasificación")
+
                         def reporte_a_dataframe(report):
                             report_dict = classification_report(y_test, y_pred, output_dict=True)
                             df_report = pd.DataFrame(report_dict).transpose()
                             return df_report
-                        st.markdown("### Reporte de Clasificación")
+
                         df_report = reporte_a_dataframe(report)
                         st.dataframe(df_report.style.format({"precision": "{:.2f}", "recall": "{:.2f}", "f1-score": "{:.2f}", "support": "{:.0f}"}))
 
