@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from imblearn.over_sampling import SMOTE  # Importar SMOTE para balancear las clases
 
+
 class GradientBoosterClassifier:
     def __init__(self):
         # Inicializar el modelo Gradient Boosting
@@ -18,7 +19,11 @@ class GradientBoosterClassifier:
         # Conectar a la base de datos SQLite
         connection = sqlite3.connect("CSV/Prediccion.db")
         query = """
-        SELECT vl.*, d.date, s.estacion, c.cloudiness AS cloudiness, w.weather
+        SELECT 
+            vl.date_id, d.date, s.estacion, 
+            c.cloudiness AS cloudiness, w.weather,
+            vl.precipitation, vl.temp_max, vl.temp_min, 
+            vl.wind, vl.humidity, vl.pressure, vl.solar_radiation, vl.visibility
         FROM ValoresLimpios vl
         JOIN dates d ON vl.date_id = d.date_id
         JOIN seasons s ON vl.estacion_id = s.estacion_id
@@ -27,9 +32,7 @@ class GradientBoosterClassifier:
         """
         # Cargar los datos de la base de datos
         df = pd.read_sql(query, connection)
-        df.drop(columns=['date_id', 'weather_id', 'cloudiness_id', 'estacion_id'], inplace=True)
-        cols = ['date'] + [col for col in df.columns if col != 'date']
-        df = df[cols]
+        df.drop(columns=['date_id'], inplace=True)
         connection.close()  # Cerrar la conexión
         return df
     
@@ -39,8 +42,12 @@ class GradientBoosterClassifier:
         # Codificar variables categóricas
         df['weather_encoded'] = self.label_encoder.fit_transform(df['weather'])
         df['cloudiness'] = pd.Categorical(df['cloudiness']).codes
-        # Crear una nueva característica: rango de temperatura
-        df['temp_range'] = df['temp_max'] - df['temp_min']
+        
+        # Crear características derivadas
+        df['temp_range'] = df['temp_max'] - df['temp_min']  # Rango de temperatura
+        df['humidity_temp_ratio'] = df['humidity'] / (df['temp_max'] + 1)  # Relación humedad/temperatura
+        df['pressure_change'] = df['pressure'].diff().fillna(0)  # Cambio en la presión atmosférica
+        df['wind_visibility_ratio'] = df['wind'] / (df['visibility'] + 1)  # Relación viento/visibilidad
         return df
 
     def entrenar_y_predecir(self, df, feature_columns, target_column):

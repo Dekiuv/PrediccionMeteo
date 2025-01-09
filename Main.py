@@ -34,9 +34,6 @@ def main():
     estaciones = ['General', 'Otoño', 'Invierno', 'Primavera', 'Verano']
     estacion_seleccionada = st.selectbox("Selecciona la estación del año", estaciones)
 
-    # Solicitar al usuario el número de días que desea predecir
-    dias = st.number_input("Número de días a predecir (Mínimo 1 día, Máximo 30 días)", min_value=1, value=7, max_value=30)
-
     # Filtrar los datos según la estación seleccionada
     if estacion_seleccionada == 'General':
         df_estacion = df
@@ -55,7 +52,12 @@ def main():
         if st.button("Realizar predicción"):
             with st.spinner('Realizando predicciones...'):
                 df_procesado = simulador.procesar_datos(df_estacion)  # Procesar los datos
-                feature_columns = ["temp_min", "humidity", "pressure", "solar_radiation", "precipitation", "cloudiness", "temp_range"]
+
+                feature_columns = [
+                    "temp_max", "temp_min", "precipitation", "wind", "humidity",
+                    "pressure", "solar_radiation", "visibility", "cloudiness",
+                    "temp_range", "humidity_temp_ratio", "pressure_change", "wind_visibility_ratio"
+                ]
 
                 if modelo_seleccionado == "Random Forest":
                     target_columns = ["temp_min", "temp_max", "precipitation", "weather", "cloudiness"]
