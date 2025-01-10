@@ -2,6 +2,7 @@ import pandas as pd
 import sqlite3
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 import numpy as np
 
 class SARIMAModel:
@@ -87,3 +88,22 @@ class SARIMAModel:
         """
         predicciones['Weather'] = self.label_encoder.inverse_transform(predicciones['Forecast'].round().astype(int))
         return predicciones
+
+# Agregar función calcular_métricas
+def calcular_métricas(y_real, y_pred):
+    """
+    Calcula las métricas de error: RMSE, MAE y MAPE.
+
+    Args:
+        y_real (array): Valores reales.
+        y_pred (array): Valores predichos.
+
+    Returns:
+        dict: Diccionario con RMSE, MAE y MAPE.
+    """
+    mse = mean_squared_error(y_real, y_pred)
+    rmse = np.sqrt(mse)
+    mae = mean_absolute_error(y_real, y_pred)
+    mape = np.mean(np.abs((y_real - y_pred) / y_real)) * 100
+
+    return {"RMSE": rmse, "MAE": mae, "MAPE": mape}

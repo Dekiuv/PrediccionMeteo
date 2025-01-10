@@ -5,6 +5,7 @@ import GradientBooster as gbc  # Importar la clase GradientBooster
 import pandas as pd
 from sklearn.metrics import classification_report
 import SARIMA as sarima  # Importar el nuevo archivo SARIMA.py
+import matplotlib.pyplot as plt
 
 # Configuración de la página
 st.set_page_config(
@@ -140,21 +141,51 @@ def main():
                     
                     # Entrenar SARIMA
                     target_column = 'weather_encoded'
-                    order = (1, 1, 1)  # Puedes ajustar estos valores según los datos
-                    seasonal_order = (1, 1, 1, 12)  # Ajustar el periodo estacional si corresponde
+                    order = (1, 1, 1)  # Ajusta según los datos
+                    seasonal_order = (1, 1, 1, 12)  # Ajusta el periodo estacional si corresponde
+                    
+                    # Capturar pasos futuros antes de usarlo
+                    pasos = st.number_input("Número de pasos a predecir (días futuros)", min_value=1, value=7)
+                    
                     resultados = sarima_model.entrenar_sarima(df_procesado, target_column, order, seasonal_order)
                     
-                    with col2:
+                    # Predicción
+                    predicciones = sarima_model.predecir(resultados, pasos)
                     
-                        # Predicción
-                        pasos = st.number_input("Número de pasos a predecir (días futuros)", min_value=1, value=7)
-                        predicciones = sarima_model.predecir(resultados, pasos)
-                        
-                        # Decodificar los resultados
-                        predicciones_descodificadas = sarima_model.descodificar_weather(predicciones)
-                        
+                    # Valores reales para comparar (últimos pasos días)
+                    valores_reales = df_procesado['weather_encoded'][-pasos:].values
+                    valores_predichos = predicciones['Forecast'].values
+
+                    # Calcular métricas
+                    metricas = sarima.calcular_métricas(valores_reales, valores_predichos)
+
+                    # Decodificar los resultados
+                    predicciones_descodificadas = sarima_model.descodificar_weather(predicciones)
+                    
+                    
+                    with col2:
                         st.subheader("Predicciones del Modelo SARIMA")
                         st.write(predicciones_descodificadas)
+                        st.markdown("---")
+                        st.subheader("Métricas de Evaluación del Modelo SARIMA")
+                        st.write(f"**RMSE:** {metricas['RMSE']:.2f}")
+                        st.write(f"**MAE:** {metricas['MAE']:.2f}")
+                        st.write(f"**MAPE:** {metricas['MAPE']:.2f}%")
+                        st.markdown("---")
+                        plt.figure(figsize=(10, 6))
+                        plt.plot(range(len(valores_reales)), valores_reales, label="Valores Reales")
+                        plt.plot(range(len(valores_predichos)), valores_predichos, label="Predicciones")
+                        plt.fill_between(
+                            range(len(valores_predichos)), 
+                            predicciones["Lower Bound"], 
+                            predicciones["Upper Bound"], 
+                            color="gray", alpha=0.2, label="Intervalo de Confianza"
+                        )
+                        plt.legend()
+                        plt.title("Predicciones del Modelo SARIMA vs Valores Reales")
+                        plt.xlabel("Días")
+                        plt.ylabel("Clima Codificado")
+                        plt.show()
 
 # Llamada a la función principal
 if __name__ == "__main__":
