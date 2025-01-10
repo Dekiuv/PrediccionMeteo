@@ -25,7 +25,7 @@ def cargar_datos():
 
 # Función para optimizar hiperparámetros y entrenar el modelo
 def optimizar_y_predecir(df, subset_size=5000):
-    feature_columns = ['precipitation', 'temp_max', 'temp_min', 'wind']  # Características
+    feature_columns = ['precipitation', 'temp_max', 'temp_min', 'wind', 'humidity', 'pressure']  # Características
     target_column = 'weather_id'
 
     X = df[feature_columns]
@@ -91,8 +91,17 @@ def optimizar_y_predecir(df, subset_size=5000):
 
     return report_df, best_model
 
+# Diccionario de mapeo para 'weather_id'
+weather_map = {
+    1: "Tormenta",
+    2: "Lluvia",
+    3: "Nublado",
+    4: "Niebla",
+    5: "Soleado"
+}
+
 # Configuración de la aplicación Streamlit
-st.title("Simulador Meteorológico - Optimización de Hiperparámetros")
+st.title("Simulador Meteorológico")
 st.write("Esta aplicación permite visualizar las predicciones del modelo meteorológico optimizado con SVC.")
 
 # Cargar los datos
@@ -100,6 +109,16 @@ df_valores = cargar_datos()
 
 st.write("Datos cargados correctamente:")
 st.dataframe(df_valores.head(10))  # Muestra las primeras 10 filas de los datos
+
+# Permitir al usuario seleccionar los valores para la predicción
+st.write("Ingrese los valores para realizar la predicción:")
+
+precipitation = st.number_input('Precipitación (mm)', min_value=0.0, max_value=500.0, value=0.0, step=0.1)
+temp_max = st.number_input('Temperatura máxima (°C)', min_value=-10.0, max_value=50.0, value=25.0, step=0.1)
+temp_min = st.number_input('Temperatura mínima (°C)', min_value=-10.0, max_value=50.0, value=15.0, step=0.1)
+wind = st.number_input('Viento (km/h)', min_value=0.0, max_value=150.0, value=10.0, step=0.1)
+humidity = st.number_input('Humedad (%)', min_value=0, max_value=100, value=50, step=1)
+pressure = st.number_input('Presión (hPa)', min_value=900, max_value=1100, value=1013, step=1)
 
 # Entrenar y predecir con optimización de hiperparámetros
 if st.button("Optimizar y predecir"):
@@ -111,7 +130,10 @@ if st.button("Optimizar y predecir"):
     st.dataframe(report_df)
 
     # Realizar una predicción con el mejor modelo
-    st.write("Realizando la primera predicción...")
-    sample = df_valores[['precipitation', 'temp_max', 'temp_min', 'wind']].iloc[0].values.reshape(1, -1)
+    st.write("Realizando la predicción con los valores ingresados...")
+    sample = [[precipitation, temp_max, temp_min, wind, humidity, pressure]]
     prediction = best_model.predict(sample)
-    st.write(f"Predicción para la primera fila: {prediction[0]}")
+
+    # Convertir la predicción en una descripción legible
+    predicted_weather = weather_map.get(prediction[0], "Desconocido")
+    st.write(f"La predicción del clima es: {predicted_weather}")
