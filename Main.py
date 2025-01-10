@@ -4,6 +4,7 @@ import Grafica as graf  # Librería para la creación de la gráfica
 import GradientBooster as gbc  # Importar la clase GradientBooster
 import pandas as pd
 from sklearn.metrics import classification_report
+import SARIMA as sarima  # Importar el nuevo archivo SARIMA.py
 
 # Configuración de la página
 st.set_page_config(
@@ -20,15 +21,20 @@ def main():
     db_path = "CSV/Prediccion.db"
 
     # Selección del modelo
-    modelo_seleccionado = st.selectbox("Selecciona el modelo de predicción", ["Random Forest", "Gradient Boosting"])
+    modelo_seleccionado = st.selectbox("Selecciona el modelo de predicción", ["Random Forest", "Gradient Boosting", "SARIMA"])
+
 
     if modelo_seleccionado == "Random Forest":
         simulador = ent.SimuladorMeteorologico(db_path)  # Clase de Random Forest
     elif modelo_seleccionado == "Gradient Boosting":
         simulador = gbc.GradientBoosterClassifier()  # Clase de Gradient Boosting con SMOTE
+    elif modelo_seleccionado == "SARIMA":
+        simulador = sarima.SARIMAModel(db_path)
+        df = simulador.cargar_datos()
+        df_procesado = simulador.procesar_datos(df)
 
     # Cargar los datos de la base de datos
-    df = simulador.cargar_datos()  # Cargar los datos de la base de datos
+    df = simulador.cargar_datos()  
 
     # Selección del usuario de la estación del año
     estaciones = ['General', 'Otoño', 'Invierno', 'Primavera', 'Verano']
@@ -125,6 +131,30 @@ def main():
                             return ['background-color: #31c852' if val['Real'] == val['Predicción'] else 'background-color: #e55361'] * len(val)
 
                         st.dataframe(df_predicciones.style.apply(resaltar_predicciones, axis=1))
+                elif modelo_seleccionado == "SARIMA":
+                    sarima_model = sarima.SARIMAModel(db_path)
+                    
+                    # Cargar datos
+                    df = sarima_model.cargar_datos()
+                    df_procesado = sarima_model.procesar_datos(df)
+                    
+                    # Entrenar SARIMA
+                    target_column = 'weather_encoded'
+                    order = (1, 1, 1)  # Puedes ajustar estos valores según los datos
+                    seasonal_order = (1, 1, 1, 12)  # Ajustar el periodo estacional si corresponde
+                    resultados = sarima_model.entrenar_sarima(df_procesado, target_column, order, seasonal_order)
+                    
+                    with col2:
+                    
+                        # Predicción
+                        pasos = st.number_input("Número de pasos a predecir (días futuros)", min_value=1, value=7)
+                        predicciones = sarima_model.predecir(resultados, pasos)
+                        
+                        # Decodificar los resultados
+                        predicciones_descodificadas = sarima_model.descodificar_weather(predicciones)
+                        
+                        st.subheader("Predicciones del Modelo SARIMA")
+                        st.write(predicciones_descodificadas)
 
 # Llamada a la función principal
 if __name__ == "__main__":
