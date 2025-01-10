@@ -46,6 +46,7 @@ class GradientBoosterClassifier:
         # Crear características derivadas
         df['temp_range'] = df['temp_max'] - df['temp_min']  # Rango de temperatura
         df['humidity_temp_ratio'] = df['humidity'] / (df['temp_max'] + 1)  # Relación humedad/temperatura
+        df = df.sort_values(by='date')
         df['pressure_change'] = df['pressure'].diff().fillna(0)  # Cambio en la presión atmosférica
         df['wind_visibility_ratio'] = df['wind'] / (df['visibility'] + 1)  # Relación viento/visibilidad
         return df
