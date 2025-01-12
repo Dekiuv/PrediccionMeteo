@@ -1,11 +1,12 @@
-﻿# Simulador de Predicción Meteorológica con Big Data 🌤️
+# Simulador de Predicción Meteorológica con Big Data 🌤️
 
 ## Descripción 📝
 Este proyecto tiene como objetivo desarrollar un simulador de predicción meteorológica que aprovecha el poder de Big Data y aprendizaje automático para predecir condiciones climáticas a corto plazo con alta precisión. Utilizamos:  
-- **Random Forest Regressor**🌲 de Scikit-learn para entrenar un modelo de predicción de temperatura y condiciones climáticas basado en características como temperatura máxima, mínima y nubosidad.
-- **Label Encoding** 🔢 para transformar las etiquetas de clima y nubosidad en valores numéricos para su uso en el modelo.
+- **SVC (Support Vector Classifier)** 🧑‍💻 de Scikit-learn para entrenar un modelo de predicción de condiciones climáticas basado en características como precipitación, temperatura máxima, mínima, viento, humedad, presión, radiación solar, visibilidad y nubosidad.
+- **SMOTE** 🔄 para balancear las clases en el conjunto de datos y mejorar la efectividad del modelo.
 - **StandardScaler** ⚖️ para normalizar las características y mejorar la precisión del modelo de predicción.
-- **Métricas de rendimiento** 📈 como el Error Absoluto Medio (MAE), Error Cuadrático Medio (MSE) y R² para evaluar la efectividad del modelo.
+- **RandomizedSearchCV** 🛠️ para optimizar los hiperparámetros del modelo.
+- **Streamlit** 💻 para crear una interfaz web interactiva que permite realizar predicciones en tiempo real a partir de los datos introducidos por el usuario.
 
 El enfoque principal de este simulador es predecir las condiciones meteorológicas futuras de manera precisa, lo que puede ser útil para diversas aplicaciones como la planificación de eventos, análisis de tendencias climáticas o gestión de recursos en función del clima.
 
@@ -14,17 +15,17 @@ El enfoque principal de este simulador es predecir las condiciones meteorológic
 - **Python**: Lenguaje de programación principal.
 - **Sqlite3**: Base de datos ligera y autónoma para almacenamiento y manipulación de datos locales.
 - **Pandas**: Manejo y análisis de datos.
-- **Scikit-learn**: Aprendizaje automático para clasificación, regresión y clustering.
-- **Plotly**: Creación de gráficos interactivos y visualizaciones avanzadas en Python.
+- **Scikit-learn**: Aprendizaje automático para clasificación y optimización de modelos.
 - **Streamlit**: Herramienta para crear aplicaciones web interactivas y visualizaciones de datos de manera rápida.
-
+- **SMOTE**: Técnica para balancear clases en problemas de clasificación.
+  
 ## Versiones necesarias ⚠️
 El proyecto utiliza las siguientes librerías y versiones específicas:  
 🐍 **Python** (3.11 o superior)    
 📚 **Pandas** (2.2.3)  
 📚 **Scikit-learn** (1.5.2)  
-📚 **Plotly** (5.24.1)  
 📚 **Streamlit** (1.41.1)  
+📚 **imblearn** (0.0.3)
 
 ## Instalación y ejecución 🚀
 
@@ -33,11 +34,7 @@ El proyecto utiliza las siguientes librerías y versiones específicas:
    ```bash
    git clone https://github.com/Dekiuv/PrediccionMeteo.git
    cd PrediccionMeteo
-   
-2. Una vez clonado el repositorio, ejecuta el siguiente código en el terminal de VSCode:
 
-   ```bash
-   python3 -m streamlit run main.py
 
 ## Dashboard con PowerBi 🖥️
 
