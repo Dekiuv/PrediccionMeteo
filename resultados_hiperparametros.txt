@@ -1,0 +1,8 @@
+Hyperparameter Tuning Results
+==========================
+Iteration 1:
+  Parameters: {'kernel': 'rbf', 'gamma': 0.1, 'C': 10}
+  Mean Fit Time: 21.44s
+  Mean Test Score: 0.9611
+  Std Test Score: 0.0039
+--------------------------

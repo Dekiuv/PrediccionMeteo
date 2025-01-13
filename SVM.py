@@ -5,7 +5,7 @@ import sqlite3
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import accuracy_score
 from imblearn.over_sampling import SMOTE
 
 # Configurar OMP_NUM_THREADS para optimizar el uso de CPU
