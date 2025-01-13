@@ -92,7 +92,7 @@ weather_map = {
 df_valores = cargar_datos()
 
 # Características fijas para el modelo
-features_options = ['date_id', 'precipitation', 'temp_max', 'temp_min', 'wind', 'humidity', 'pressure', 'solar_radiation', 'visibility', 'cloudiness_id', 'estacion_id']
+features_options = ['precipitation', 'temp_max', 'temp_min', 'humidity', 'solar_radiation', 'visibility']
 selected_features = features_options  # Usamos estas características siempre
 
 # Preparar los datos con las características seleccionadas
@@ -108,17 +108,12 @@ st.write("Esta aplicación permite predecir las condiciones meteorológicas bas�
 # Formulario interactivo para que el usuario ingrese los datos
 st.write("**Ingrese los valores para realizar una predicción personalizada:**")
 
-date_id = st.number_input('ID de fecha', min_value=0, max_value=100000, value=1)
 precipitation = st.number_input('Precipitación (mm)', min_value=0.0, max_value=500.0, value=0.0, step=0.1)
 temp_max = st.number_input('Temperatura máxima (°C)', min_value=-10.0, max_value=50.0, value=25.0, step=0.1)
 temp_min = st.number_input('Temperatura mínima (°C)', min_value=-10.0, max_value=50.0, value=15.0, step=0.1)
-wind = st.number_input('Viento (km/h)', min_value=0.0, max_value=150.0, value=10.0, step=0.1)
 humidity = st.number_input('Humedad (%)', min_value=0, max_value=100, value=60, step=1)
-pressure = st.number_input('Presión atmosférica (hPa)', min_value=900, max_value=1100, value=1015, step=1)
 solar_radiation = st.number_input('Radiación solar (W/m²)', min_value=0, max_value=2000, value=500, step=1)
 visibility = st.number_input('Visibilidad (km)', min_value=0.0, max_value=100.0, value=10.0, step=0.1)
-cloudiness_id = st.number_input('Nubosidad (1: Parcialmente nublado, 2: Despejado, 3: Cubierto)', min_value=1, max_value=3, value=1, step=1)
-estacion_id = st.number_input('Estación (1: Invierno, 2: Primavera, 3: Verano, 4: Otoño)', min_value=1, max_value=4, value=1, step=1)
 
 
 # Botón para entrenar el modelo y hacer la predicción
@@ -129,7 +124,7 @@ if st.button("Entrenar y Predecir Clima"):
     st.success("Entrenamiento completado!")
 
     # Predicción con los valores del usuario
-    sample = scaler.transform([[date_id, precipitation, temp_max, temp_min, wind, humidity, pressure, solar_radiation, visibility, cloudiness_id, estacion_id]])
+    sample = scaler.transform([[precipitation, temp_max, temp_min, humidity, solar_radiation, visibility]])
     prediction = best_model.predict(sample) # Realizar la predicción
     predicted_weather = weather_map.get(prediction[0], "Desconocido") # Mapear el valor de 'weather_id' a una etiqueta
     
