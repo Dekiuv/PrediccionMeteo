@@ -7,7 +7,7 @@ import sqlite3
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
-from sklearn.metrics import accuracy_score, precision_score, recall_score, r2_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, r2_score, f1_score, mean_absolute_error, mean_squared_error
 import joblib
 
 # Configurar la página de Streamlit como primera línea
@@ -87,14 +87,15 @@ with col1:
 
 # Columna 2: Resultado de la predicción
 with col2:
+    col1, col2, col3 = st.columns(3)
+    with col2:
         if predict_button:
-            with st.spinner('Realizando la predicción...'):
-                # Realizar la predicción con el modelo cargado
-                sample = [[precipitation, wind, humidity, visibility]]
-                sample_scaled = scaler.transform(sample)  # Usar el scaler entrenado
-                prediction = best_model.predict(sample_scaled)
-                weather_map = {1: "Tormenta", 2: "Lluvia", 3: "Nublado", 4: "Niebla", 5: "Soleado"}
-                predicted_weather = weather_map.get(prediction[0], "Desconocido")
+            # Realizar la predicción con el modelo cargado
+            sample = [[precipitation, wind, humidity, visibility]]
+            sample_scaled = scaler.transform(sample)  # Usar el scaler entrenado
+            prediction = best_model.predict(sample_scaled)
+            weather_map = {1: "Tormenta", 2: "Lluvia", 3: "Nublado", 4: "Niebla", 5: "Soleado"}
+            predicted_weather = weather_map.get(prediction[0], "Desconocido")
 
             # Mostrar la imagen correspondiente según el resultado de la predicción
             image_paths = {
@@ -108,28 +109,21 @@ with col2:
             st.image(imagen_path, width=310)
 
             # Mostrar un desplegable con la "Información de la predicción"
-            with st.expander("Información de la predicción"):
+            # Mostrar las métricas y guardarlas en una variable para el archivo
+            y_pred = best_model.predict(X_test)  # Predicciones en el conjunto de prueba
+            accuracy = accuracy_score(y_test, y_pred)
+            precision = precision_score(y_test, y_pred, average='weighted', zero_division=1)
+            recall = recall_score(y_test, y_pred, average='weighted', zero_division=1)
+            f1 = f1_score(y_test, y_pred, average='weighted', zero_division=1)
+            r2 = r2_score(y_test, y_pred)
+            mae = mean_absolute_error(y_test, y_pred)
+            mse = mean_squared_error(y_test, y_pred)
 
-                # Mostrar la predicción del clima
-                st.write(f"**Predicción del clima:** {predicted_weather}")
-
-                # Mostrar la precisión del modelo en el conjunto de prueba
-                y_pred = best_model.predict(X_test)  # Predicciones en el conjunto de prueba
-                accuracy = accuracy_score(y_test, y_pred)  # Calcular la precisión
-                st.write(f"**Accuracy:** {accuracy:.2f}")
-
-                # Mostrar la precisión (precision) del modelo
-                precision = precision_score(y_test, y_pred, average='weighted', zero_division=1)  # Calcular precision
-                st.write(f"**Precision:** {precision:.2f}")
-
-                # Mostrar el recall del modelo
-                recall = recall_score(y_test, y_pred, average='weighted', zero_division=1)  # Calcular recall
-                st.write(f"**Recall:** {recall:.2f}")
-
-                # Mostrar el F1-score del modelo
-                f1 = f1_score(y_test, y_pred, average='weighted', zero_division=1)  # Calcular F1-score
-                st.write(f"**F1-score:** {f1:.2f}")
-
-                # Mostrar el R²
-                r2 = r2_score(y_test, y_pred)  # Calcular R²
-                st.write(f"**R² del modelo:** {r2:.2f}")
+            # Mostrar las métricas en la consola
+            print(f"Accuracy: {accuracy:.2f}")
+            print(f"Precision: {precision:.2f}")
+            print(f"Recall: {recall:.2f}")
+            print(f"F1-score: {f1:.2f}")
+            print(f"R² del modelo: {r2:.2f}")
+            print(f"MAE (Error Absoluto Medio): {mae:.2f}")
+            print(f"MSE (Error Cuadrático Medio): {mse:.2f}")
