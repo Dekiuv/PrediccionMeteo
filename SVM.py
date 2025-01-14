@@ -5,7 +5,9 @@ import sqlite3
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, r2_score, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 
 # Configurar OMP_NUM_THREADS para optimizar el uso de CPU
@@ -30,31 +32,41 @@ def cargar_datos():
 
 # Función para preparar los datos
 def preparar_datos(df, feature_columns):
-    target_column = 'weather_id' # Columna que se va a predecir
+    target_column = 'weather_id'  # Columna que se va a predecir
 
-    X = df[feature_columns] # Características
-    y = df[target_column] # Etiquetas
+    X = df[feature_columns]  # Características
+    y = df[target_column]  # Etiquetas
 
     # Dividir los datos
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
     # Aplicar SMOTE para balancear las clases
-    smote = SMOTE(random_state=42) 
-    X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train) 
+    smote = SMOTE(random_state=42)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
     # Escalar los datos
-    scaler = StandardScaler() 
-    X_train_scaled = scaler.fit_transform(X_train_resampled) # Escalar los datos de entrenamiento
-    X_test_scaled = scaler.transform(X_test) # Escalar los datos de prueba
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train_resampled)  # Escalar los datos de entrenamiento
+    X_test_scaled = scaler.transform(X_test)  # Escalar los datos de prueba
 
     return X_train_scaled, X_test_scaled, y_train_resampled, y_test, scaler
+
+# Pesos de clase definidos
+class_weights = {
+    1: 2.7517886626307098,  # Tormenta
+    2: 2.6399155227032733,  # Lluvia
+    3: 4.2408821034775235,  # Nublado
+    4: 56.81818181818182,   # Niebla
+    5: 227.27272727272728   # Soleado
+}
 
 # Función para optimizar hiperparámetros y entrenar el modelo
 def optimizar_y_entrenar(X_train, y_train):
     param_distributions = {
-        'C': [10],
-        'gamma': [0.1],
-        'kernel': ['rbf']
+        'C': [0.1, 1, 10, 100, 1000],
+        'gamma': ['scale', 'auto', 0.1, 1, 10],
+        'kernel': ['linear', 'rbf', 'poly'],
+        'class_weight': [class_weights]  # Usar los pesos de clase
     }
 
     # Optimizar modelo con RandomizedSearchCV
@@ -92,7 +104,7 @@ weather_map = {
 df_valores = cargar_datos()
 
 # Características fijas para el modelo
-features_options = ['date_id', 'precipitation', 'temp_max', 'temp_min', 'wind', 'humidity', 'pressure', 'solar_radiation', 'visibility', 'cloudiness_id', 'estacion_id']
+features_options = ['precipitation', 'wind', 'humidity', 'visibility']
 selected_features = features_options  # Usamos estas características siempre
 
 # Preparar los datos con las características seleccionadas
@@ -108,34 +120,35 @@ st.write("Esta aplicación permite predecir las condiciones meteorológicas bas�
 # Formulario interactivo para que el usuario ingrese los datos
 st.write("**Ingrese los valores para realizar una predicción personalizada:**")
 
-date_id = st.number_input('ID de fecha', min_value=0, max_value=100000, value=1)
 precipitation = st.number_input('Precipitación (mm)', min_value=0.0, max_value=500.0, value=0.0, step=0.1)
-temp_max = st.number_input('Temperatura máxima (°C)', min_value=-10.0, max_value=50.0, value=25.0, step=0.1)
-temp_min = st.number_input('Temperatura mínima (°C)', min_value=-10.0, max_value=50.0, value=15.0, step=0.1)
 wind = st.number_input('Viento (km/h)', min_value=0.0, max_value=150.0, value=10.0, step=0.1)
 humidity = st.number_input('Humedad (%)', min_value=0, max_value=100, value=60, step=1)
-pressure = st.number_input('Presión atmosférica (hPa)', min_value=900, max_value=1100, value=1015, step=1)
-solar_radiation = st.number_input('Radiación solar (W/m²)', min_value=0, max_value=2000, value=500, step=1)
 visibility = st.number_input('Visibilidad (km)', min_value=0.0, max_value=100.0, value=10.0, step=0.1)
-cloudiness_id = st.number_input('Nubosidad (1: Parcialmente nublado, 2: Despejado, 3: Cubierto)', min_value=1, max_value=3, value=1, step=1)
-estacion_id = st.number_input('Estación (1: Invierno, 2: Primavera, 3: Verano, 4: Otoño)', min_value=1, max_value=4, value=1, step=1)
-
 
 # Botón para entrenar el modelo y hacer la predicción
 if st.button("Entrenar y Predecir Clima"):
     with st.spinner('Entrenando el modelo y optimizando hiperparámetros...'):
-        best_model, archivo_guardado, random_search = optimizar_y_entrenar(X_train, y_train) # Entrenar y optimizar el modelo
+        best_model, archivo_guardado, random_search = optimizar_y_entrenar(X_train, y_train)  # Entrenar y optimizar el modelo
     
     st.success("Entrenamiento completado!")
 
     # Predicción con los valores del usuario
-    sample = scaler.transform([[date_id, precipitation, temp_max, temp_min, wind, humidity, pressure, solar_radiation, visibility, cloudiness_id, estacion_id]])
-    prediction = best_model.predict(sample) # Realizar la predicción
-    predicted_weather = weather_map.get(prediction[0], "Desconocido") # Mapear el valor de 'weather_id' a una etiqueta
+    sample = scaler.transform([[precipitation, wind, humidity, visibility]])
+    prediction = best_model.predict(sample)  # Realizar la predicción
+    predicted_weather = weather_map.get(prediction[0], "Desconocido")  # Mapear el valor de 'weather_id' a una etiqueta
     
     st.write(f"**Predicción del clima:** {predicted_weather}")
 
     # Mostrar la precisión del modelo en el conjunto de prueba
-    y_pred = best_model.predict(X_test) # Predicciones en el conjunto de prueba
-    accuracy = accuracy_score(y_test, y_pred) # Calcular la precisión
+    y_pred = best_model.predict(X_test)  # Predicciones en el conjunto de prueba
+    accuracy = accuracy_score(y_test, y_pred)  # Calcular la precisión
     st.write(f"**Precisión en el conjunto de prueba:** {accuracy:.2f}")
+    
+    # Mostrar el R²
+    r2 = r2_score(y_test, y_pred)  # Calcular R²
+    st.write(f"**R² del modelo:** {r2:.2f}")
+    
+    # Mostrar el reporte de clasificación
+    st.write("**Reporte de clasificación:**")
+    report = classification_report(y_test, y_pred, target_names=weather_map.values(), output_dict=True)
+    st.write(report)
