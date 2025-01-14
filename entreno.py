@@ -1,5 +1,3 @@
-# entreno.py
-
 import os
 import pandas as pd
 import sqlite3
@@ -8,6 +6,7 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
 import joblib
+import time  # Importamos el módulo time para medir el tiempo de ejecución
 
 # Función para cargar datos desde SQLite
 def cargar_datos():
@@ -59,7 +58,18 @@ def optimizar_y_entrenar(X_train, y_train):
     # Optimizar modelo con RandomizedSearchCV
     model = SVC(probability=True)  # Activar las probabilidades
     random_search = RandomizedSearchCV(model, param_distributions, n_iter=20, cv=3, scoring='accuracy', n_jobs=-1, verbose=2)
+    
+    # Registrar el tiempo de inicio
+    start_time = time.time()
+
     random_search.fit(X_train, y_train)
+
+    # Registrar el tiempo de finalización
+    end_time = time.time()
+
+    # Calcular el tiempo total
+    elapsed_time = end_time - start_time
+    print(f"Tiempo de entrenamiento: {elapsed_time:.2f} segundos")
 
     return random_search.best_estimator_
 
