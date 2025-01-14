@@ -63,8 +63,8 @@ class_weights = {
 # Función para optimizar hiperparámetros y entrenar el modelo
 def optimizar_y_entrenar(X_train, y_train):
     param_distributions = {
-        'C': [0.1, 1, 10, 100, 1000],
-        'gamma': ['scale', 'auto', 0.1, 1, 10],
+        'C': [0.1, 1, 10, 100],
+        'gamma': ['scale', 0.1, 1, 10],
         'kernel': ['linear', 'rbf', 'poly'],
         'class_weight': [class_weights]  # Usar los pesos de clase
     }
