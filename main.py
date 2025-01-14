@@ -7,7 +7,7 @@ import sqlite3
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
-from sklearn.metrics import accuracy_score, precision_score, recall_score, r2_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, r2_score, f1_score
 import joblib
 
 # Configurar la página de Streamlit como primera línea
@@ -125,6 +125,10 @@ with col2:
                 # Mostrar el recall del modelo
                 recall = recall_score(y_test, y_pred, average='weighted', zero_division=1)  # Calcular recall
                 st.write(f"**Recall:** {recall:.2f}")
+
+                # Mostrar el F1-score del modelo
+                f1 = f1_score(y_test, y_pred, average='weighted', zero_division=1)  # Calcular F1-score
+                st.write(f"**F1-score:** {f1:.2f}")
 
                 # Mostrar el R²
                 r2 = r2_score(y_test, y_pred)  # Calcular R²
