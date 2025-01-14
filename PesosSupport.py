@@ -1,3 +1,4 @@
+# Description: Calcular los pesos inversamente proporcionales al soporte de las clases
 support = {
     "Tormenta": 1817,
     "Lluvia": 1894,
@@ -6,6 +7,7 @@ support = {
     "Soleado": 22
 }
 
+# Calcular el número total de muestras
 total_samples = sum(support.values())
 
 # Calcular pesos inversamente proporcionales al soporte
