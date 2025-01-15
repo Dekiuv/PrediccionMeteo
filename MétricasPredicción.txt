@@ -1,5 +1,16 @@
-Optimización de hiperparámetros y entreno el modelo
+//////////////////////////////////////////////
+Mejores Metricas de predicción: Parametros 17
+    - Accuracy: 0.97
+    - Precision: 0.98
+    - Recall: 0.97
+    - F1-score: 0.98
+    - R² del modelo: 0.89
+    - MAE (Error Absoluto Medio): 0.04
+    - MSE (Error Cuadrático Medio): 0.08
+//////////////////////////////////////////////
 
+---------------------------------------------------
+Optimización de hiperparámetros y entreno el modelo
 ---------------------------------------------------
 Parametros 1:
     - C: 1
@@ -113,7 +124,7 @@ Parametros 16:
     - Class_weight: Diccionario personalizado
     - Tiempo: 207.33 segundos
 ---------------------------------------------------
-Parametros 17: (MEJOR HIPERPARAMETROS)
+Parametros 17: (MEJOR HIPERPÁRAMETROS)
     - C: 100
     - Gamma: 0.1
     - Kernel: rbf
@@ -141,12 +152,3 @@ Parametros 20:
     - Class_weight: Diccionario personalizado
     - Tiempo: 11074 segundos
 ---------------------------------------------------
-
-Mejores Metricas de predicción:
-    - Accuracy: 0.97
-    - Precision: 0.98
-    - Recall: 0.97
-    - F1-score: 0.98
-    - R² del modelo: 0.89
-    - MAE (Error Absoluto Medio): 0.04
-    - MSE (Error Cuadrático Medio): 0.08

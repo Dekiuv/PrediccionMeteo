@@ -1,5 +1,3 @@
-# main.py
-
 import os
 import streamlit as st
 import pandas as pd
@@ -70,7 +68,7 @@ selected_features = features_options  # Usamos estas características siempre
 X_train, X_test, y_train, y_test, scaler = preparar_datos(df_valores, selected_features)
 
 # Configuración de la aplicación Streamlit
-st.title("Simulador Meteorológico")
+st.title("Simulador Meteorológico - Grupo 3")
 st.write("Esta aplicación permite predecir las condiciones meteorológicas basándose en los datos ingresados.")
 
 # Dividir la página en dos columnas
@@ -108,8 +106,7 @@ with col2:
             imagen_path = image_paths.get(predicted_weather, "Image/Desconocido.png")
             st.image(imagen_path, width=310)
 
-            # Mostrar un desplegable con la "Información de la predicción"
-            # Mostrar las métricas y guardarlas en una variable para el archivo
+            # Calculo de métricas
             y_pred = best_model.predict(X_test)  # Predicciones en el conjunto de prueba
             accuracy = accuracy_score(y_test, y_pred)
             precision = precision_score(y_test, y_pred, average='weighted', zero_division=1)
