@@ -3,151 +3,144 @@ Optimización de hiperparámetros y entreno el modelo
 ---------------------------------------------------
 Parametros 1:
     - C: 1
-    - Gamma:
-    - Kernel:
+    - Gamma: scale
+    - Kernel: poly
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 22.43 segundos
 ---------------------------------------------------
 Parametros 2:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 1
+    - Gamma: 10
+    - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 24.47 segundos
 ---------------------------------------------------
 Parametros 3:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 10
+    - Gamma: 1
+    - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 80 segundos
 ---------------------------------------------------
 Parametros 4:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 10
+    - Gamma: 1
+    - Kernel: rbf
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 22.17 segundos
 ---------------------------------------------------
 Parametros 5:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 100
+    - Gamma: 0.1
+    - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 2484 + 2538 + 2592 segundos
 ---------------------------------------------------
 Parametros 6:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 1
+    - Gamma: 1
+    - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 22 + 21.8 segundos
 ---------------------------------------------------
 Parametros 7:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 100
+    - Gamma: 1
+    - Kernel: rbf
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 26.37 segundos
 ---------------------------------------------------
 Parametros 8:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 100
+    - Gamma: scale
+    - Kernel: rbf
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 28.87 segundos
 ---------------------------------------------------
 Parametros 9:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 1
+    - Gamma: 0.1
+    - Kernel: poly
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 28.27 segundos
 ---------------------------------------------------
 Parametros 10:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 1
+    - Gamma: 1
+    - Kernel: poly
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 145 + 180 segundos
 ---------------------------------------------------
 Parametros 11:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 100
+    - Gamma: 0.1
+    - Kernel: poly
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 32.55 + 35.1 segundos
 ---------------------------------------------------
 Parametros 12:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 0.1
+    - Gamma: 0.1
+    - Kernel: poly
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 49.38 segundos
 ---------------------------------------------------
 Parametros 13:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 0.1
+    - Gamma: 1
+    - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 17.35 segundos
 ---------------------------------------------------
 Parametros 14:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 10
+    - Gamma: 10
+    - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 73.33 segundos
 ---------------------------------------------------
 Parametros 15:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 1
+    - Gamma: scale
+    - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 23.20 segundos
 ---------------------------------------------------
 Parametros 16:
-    - C:
-    - Gamma:
-    - Kernel:
+    - C: 1
+    - Gamma: 10
+    - Kernel: rbf
     - Class_weight: Diccionario personalizado
-    - Tiempo:
+    - Tiempo: 207.33 segundos
 ---------------------------------------------------
-Parametros 17:
-    - C:
-    - Gamma:
-    - Kernel:
-    - Class_weight: Diccionario personalizado
-    - Tiempo:
----------------------------------------------------
-Parametros 18:
-    - C:
-    - Gamma:
-    - Kernel:
-    - Class_weight: Diccionario personalizado
-    - Tiempo:
----------------------------------------------------
-Parametros 19:
-    - C:
-    - Gamma:
-    - Kernel:
-    - Class_weight: Diccionario personalizado
-    - Tiempo:
----------------------------------------------------
-Parametros 20:
-    - C:
-    - Gamma:
-    - Kernel:
-    - Class_weight: Diccionario personalizado
-    - Tiempo:
----------------------------------------------------
-
-Mejores Parametros Hiperparametros:
+Parametros 17: (MEJOR HIPERPARAMETROS)
     - C: 100
     - Gamma: 0.1
     - Kernel: rbf
     - Class_weight: Diccionario personalizado
     - Tiempo: 39.83 segundos
+---------------------------------------------------
+Parametros 18:
+    - C: 10
+    - Gamma: 0.1
+    - Kernel: poly
+    - Class_weight: Diccionario personalizado
+    - Tiempo: 20.53 segundos
+---------------------------------------------------
+Parametros 19:
+    - C: 0.1
+    - Gamma: 0.1
+    - Kernel: rbf
+    - Class_weight: Diccionario personalizado
+    - Tiempo: 43.30 segundos
+---------------------------------------------------
+Parametros 20:
+    - C: 100
+    - Gamma: 1
+    - Kernel: poly
+    - Class_weight: Diccionario personalizado
+    - Tiempo: 11074 segundos
+---------------------------------------------------
 
 Mejores Metricas de predicción:
     - Accuracy: 0.97
