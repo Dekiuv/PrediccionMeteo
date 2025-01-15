@@ -35,7 +35,7 @@ El proyecto utiliza las siguientes librerías y versiones específicas:
    git clone https://github.com/Dekiuv/PrediccionMeteo.git
    cd PrediccionMeteo
 
-2. Tambien se puede acceder mediante este enlace sin necesidad de descargas:
+2. También se puede acceder mediante este enlace sin necesidad de descargas:
    ```bash
    https://prediccionmeteog3.streamlit.app/
 
