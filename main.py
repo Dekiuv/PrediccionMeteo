@@ -105,6 +105,7 @@ with col2:
             }
             imagen_path = image_paths.get(predicted_weather, "Image/Desconocido.png")
             st.image(imagen_path, width=310)
+            st.write(f"La predicción del clima es: **{predicted_weather}**")
 
             # Calculo de métricas
             y_pred = best_model.predict(X_test)  # Predicciones en el conjunto de prueba
@@ -116,11 +117,21 @@ with col2:
             mae = mean_absolute_error(y_test, y_pred)
             mse = mean_squared_error(y_test, y_pred)
 
-            # Mostrar las métricas en la consola
-            print(f"Accuracy: {accuracy:.2f}")
-            print(f"Precision: {precision:.2f}")
-            print(f"Recall: {recall:.2f}")
-            print(f"F1-score: {f1:.2f}")
-            print(f"R² del modelo: {r2:.2f}")
-            print(f"MAE (Error Absoluto Medio): {mae:.2f}")
-            print(f"MSE (Error Cuadrático Medio): {mse:.2f}")
+            # Crear las métricas para descargar
+            metrics_text = (
+                f"Accuracy: {accuracy:.2f}\n"
+                f"Precision: {precision:.2f}\n"
+                f"Recall: {recall:.2f}\n"
+                f"F1-score: {f1:.2f}\n"
+                f"R² del modelo: {r2:.2f}\n"
+                f"MAE (Error Absoluto Medio): {mae:.2f}\n"
+                f"MSE (Error Cuadrático Medio): {mse:.2f}\n"
+            )
+
+            # Botón para descargar las métricas
+            st.download_button(
+                label="Descargar métricas",
+                data=metrics_text,
+                file_name="metrics.txt",
+                mime="text/plain"
+            )
