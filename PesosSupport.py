@@ -1,4 +1,4 @@
-# Description: Calcular los pesos inversamente proporcionales al soporte de las clases
+# Calcular los pesos inversamente proporcionales al soporte de las clases
 support = {
     "Tormenta": 1817,
     "Lluvia": 1894,
