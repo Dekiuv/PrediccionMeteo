@@ -2,7 +2,7 @@
 
 ## Descripción 📝
 Este proyecto tiene como objetivo desarrollar un simulador de predicción meteorológica que aprovecha el poder de Big Data y aprendizaje automático para predecir condiciones climáticas a corto plazo con alta precisión. Utilizamos:  
-- **SVC (Support Vector Classifier)** 🧑‍💻 de Scikit-learn para entrenar un modelo de predicción de condiciones climáticas basado en características como precipitación, temperatura máxima, mínima, viento, humedad, presión, radiación solar, visibilidad y nubosidad.
+- **SVC (Support Vector Classifier)** 🧑‍💻 de Scikit-learn para entrenar un modelo de predicción de condiciones climáticas basado en características como precipitación, viento, humedad y visibilidad.
 - **SMOTE** 🔄 para balancear las clases en el conjunto de datos y mejorar la efectividad del modelo.
 - **StandardScaler** ⚖️ para normalizar las características y mejorar la precisión del modelo de predicción.
 - **RandomizedSearchCV** 🛠️ para optimizar los hiperparámetros del modelo.
