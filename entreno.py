@@ -6,11 +6,11 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
 import joblib
-import time  # Importamos el módulo time para medir el tiempo de ejecución
+import time
 
 # Función para cargar datos desde SQLite
 def cargar_datos():
-    db_path = "CSV/Prediccion.db"  # Cambiar a la ruta correcta
+    db_path = "CSV/Prediccion.db"
     connection = sqlite3.connect(db_path)
     query_valores = "SELECT * FROM ValoresLimpios"
     df_valores = pd.read_sql_query(query_valores, connection)
@@ -19,7 +19,7 @@ def cargar_datos():
 
 # Función para preparar los datos
 def preparar_datos(df, feature_columns):
-    target_column = 'weather_id'  # Columna que se va a predecir
+    target_column = 'weather_id'  # Columna que queremos predecir
 
     X = df[feature_columns]  # Características
     y = df[target_column]  # Etiquetas
@@ -56,7 +56,7 @@ def optimizar_y_entrenar(X_train, y_train):
         'class_weight': [class_weights]  # Usar los pesos de clase
     }
     # Optimizar modelo con RandomizedSearchCV
-    model = SVC(probability=True)  # Activar las probabilidades
+    model = SVC(probability=True)  # Uso de probabilidad para obtener las predicciones
     random_search = RandomizedSearchCV(model, param_distributions, n_iter=20, cv=3, scoring='accuracy', n_jobs=-1, verbose=2)
     
     # Registrar el tiempo de inicio
@@ -85,7 +85,7 @@ def main():
     df_valores = cargar_datos()
 
     # Características fijas para el modelo
-    features_options = ['precipitation', 'wind', 'humidity', 'visibility']
+    features_options = ['precipitation', 'wind', 'humidity', 'visibility'] # Características seleccionadas
     selected_features = features_options  # Usamos estas características siempre
 
     # Preparar los datos con las características seleccionadas

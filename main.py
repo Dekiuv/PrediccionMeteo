@@ -8,7 +8,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.metrics import accuracy_score, precision_score, recall_score, r2_score, f1_score, mean_absolute_error, mean_squared_error
 import joblib
 
-# Configurar la página de Streamlit como primera línea
+# Configurar la página de Streamlit
 st.set_page_config(
     page_title="Simulador Meteorológico",
     page_icon="🌤️",
@@ -25,7 +25,7 @@ def cargar_modelo(nombre_archivo):
 # Cargar los datos de entrada desde SQLite
 @st.cache_data
 def cargar_datos():
-    db_path = "CSV/Prediccion.db"  # Cambiar a la ruta correcta
+    db_path = "CSV/Prediccion.db"
     connection = sqlite3.connect(db_path)
     query_valores = "SELECT * FROM ValoresLimpios"
     df_valores = pd.read_sql_query(query_valores, connection)
@@ -34,7 +34,7 @@ def cargar_datos():
 
 # Función para preparar los datos (igual que en entreno.py)
 def preparar_datos(df, feature_columns):
-    target_column = 'weather_id'  # Columna que se va a predecir
+    target_column = 'weather_id'  # Columna que vamos a predecir
 
     X = df[feature_columns]  # Características
     y = df[target_column]  # Etiquetas
@@ -61,8 +61,8 @@ best_model = cargar_modelo(modelo_guardado)
 df_valores = cargar_datos()
 
 # Características fijas para el modelo
-features_options = ['precipitation', 'wind', 'humidity', 'visibility']
-selected_features = features_options  # Usamos estas características siempre
+features_options = ['precipitation', 'wind', 'humidity', 'visibility'] # Características disponibles para el modelo
+selected_features = features_options
 
 # Preparar los datos con las características seleccionadas
 X_train, X_test, y_train, y_test, scaler = preparar_datos(df_valores, selected_features)
@@ -89,11 +89,11 @@ with col2:
     with col2:
         if predict_button:
             # Realizar la predicción con el modelo cargado
-            sample = [[precipitation, wind, humidity, visibility]]
+            sample = [[precipitation, wind, humidity, visibility]] # Datos ingresados por el usuario
             sample_scaled = scaler.transform(sample)  # Usar el scaler entrenado
-            prediction = best_model.predict(sample_scaled)
+            prediction = best_model.predict(sample_scaled) # Realizar la predicción
             weather_map = {1: "Tormenta", 2: "Lluvia", 3: "Nublado", 4: "Niebla", 5: "Soleado"}
-            predicted_weather = weather_map.get(prediction[0], "Desconocido")
+            predicted_weather = weather_map.get(prediction[0], "Desconocido") # Obtener el clima predicho
 
             # Mostrar la imagen correspondiente según el resultado de la predicción
             image_paths = {
@@ -104,11 +104,11 @@ with col2:
                 "Niebla": "Image/Fog.png"
             }
             imagen_path = image_paths.get(predicted_weather, "Image/Desconocido.png")
-            st.image(imagen_path, width=310)
+            st.image(imagen_path, width=310) # Mostrar la imagen
             st.write(f"La predicción del clima es: **{predicted_weather}**")
 
             # Calculo de métricas
-            y_pred = best_model.predict(X_test)  # Predicciones en el conjunto de prueba
+            y_pred = best_model.predict(X_test) # Predicciones del mejor modelo 
             accuracy = accuracy_score(y_test, y_pred)
             precision = precision_score(y_test, y_pred, average='weighted', zero_division=1)
             recall = recall_score(y_test, y_pred, average='weighted', zero_division=1)
