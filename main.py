@@ -67,7 +67,7 @@ X_train, X_test, y_train, y_test, scaler = preparar_datos(df_valores, features_o
 
 # Configuración de la aplicación Streamlit
 st.title("Simulador Meteorológico - Grupo 3")
-st.write("Esta aplicación permite predecir las condiciones meteorológicas basándose en los datos ingresados.")
+st.write("Porfavor, introduzca los valores para realizar la predicción del clima.")
 
 # Dividir la página en dos columnas para mostrar el formulario y el resultado
 col1, col2 = st.columns(2)
