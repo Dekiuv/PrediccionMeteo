@@ -19,10 +19,9 @@ def cargar_datos():
 
 # Función para preparar los datos
 def preparar_datos(df, feature_columns):
-    target_column = 'weather_id'  # Columna que queremos predecir
 
     X = df[feature_columns]  # Características
-    y = df[target_column]  # Etiquetas
+    y = df['weather_id']  # Valor a predecir
 
     # Dividir los datos
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)

@@ -34,10 +34,9 @@ def cargar_datos():
 
 # Función para preparar los datos (igual que en entreno.py)
 def preparar_datos(df, feature_columns):
-    target_column = 'weather_id'  # Columna que vamos a predecir
 
     X = df[feature_columns]  # Características
-    y = df[target_column]  # Etiquetas
+    y = df['weather_id']  # Predecir
 
     # Dividir los datos
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
@@ -62,10 +61,9 @@ df_valores = cargar_datos()
 
 # Características fijas para el modelo
 features_options = ['precipitation', 'wind', 'humidity', 'visibility'] # Características disponibles para el modelo
-selected_features = features_options
 
 # Preparar los datos con las características seleccionadas
-X_train, X_test, y_train, y_test, scaler = preparar_datos(df_valores, selected_features)
+X_train, X_test, y_train, y_test, scaler = preparar_datos(df_valores, features_options)
 
 # Configuración de la aplicación Streamlit
 st.title("Simulador Meteorológico - Grupo 3")
