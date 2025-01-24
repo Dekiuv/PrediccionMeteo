@@ -1,4 +1,4 @@
-import os
+# Importamos todas las librerías necesarias
 import pandas as pd
 import sqlite3
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
@@ -20,24 +20,26 @@ def cargar_datos():
 # Función para preparar los datos
 def preparar_datos(df, feature_columns):
 
-    X = df[feature_columns]  # Características
-    y = df['weather_id']  # Valor a predecir
+    # Seleccionar las características (X) y la variable objetivo (y)
+    X = df[feature_columns]  # Variables independientes (características seleccionadas)
+    y = df['weather_id']  # Variable a predecir (columna objetivo)
 
-    # Dividir los datos
+    # Dividir los datos en conjuntos de entrenamiento y prueba
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
-    # Aplicar SMOTE para balancear las clases
+    # Aplicar SMOTE para balancear las clases en el conjunto de entrenamiento
     smote = SMOTE(random_state=42)
     X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
-    # Escalar los datos
+    # Escalar los datos para que tengan una media de 0 y una desviación estándar de 1
+    # El escalador solo se ajustara con los datos de entrenamiento
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train_resampled)  # Escalar los datos de entrenamiento
     X_test_scaled = scaler.transform(X_test)  # Escalar los datos de prueba
 
     return X_train_scaled, X_test_scaled, y_train_resampled, y_test, scaler
 
-# Pesos de clase definidos
+# Pesos definidos para balancear las clases desbalanceadas en el modelo, procedimiento en PesosSupport.py
 class_weights = {
     1: 2.7517886626307098,  # Tormenta
     2: 2.6399155227032733,  # Lluvia
@@ -48,25 +50,24 @@ class_weights = {
 
 # Función para optimizar hiperparámetros y entrenar el modelo
 def optimizar_y_entrenar(X_train, y_train):
+    # Definir algunos hiperparametros para el modelo
     param_distributions = {
         'C': [0.1, 1, 10, 100],
         'gamma': ['scale', 0.1, 1, 10],
         'kernel': ['linear', 'rbf', 'poly'],
-        'class_weight': [class_weights]  # Usar los pesos de clase
+        'class_weight': [class_weights]  # Usar los pesos definidos
     }
-    # Optimizar modelo con RandomizedSearchCV
-    model = SVC(probability=True)  # Uso de probabilidad para obtener las predicciones
+
+    # Crear una instancia del modelo SVM
+    model = SVC(probability=True)  # Habilitar probabilidad para predicciones probabilísticas
     random_search = RandomizedSearchCV(model, param_distributions, n_iter=20, cv=3, scoring='accuracy', n_jobs=-1, verbose=2)
     
-    # Registrar el tiempo de inicio
+    # Registrar el tiempo de entreno
     start_time = time.time()
-
-    random_search.fit(X_train, y_train)
-
-    # Registrar el tiempo de finalización
+    random_search.fit(X_train, y_train) # Ajustar el modelo a los datos
     end_time = time.time()
 
-    # Calcular el tiempo total
+    # Calcular el tiempo total de entreno
     elapsed_time = end_time - start_time
     print(f"Tiempo de entrenamiento: {elapsed_time:.2f} segundos")
 
@@ -83,14 +84,13 @@ def main():
     # Cargar datos
     df_valores = cargar_datos()
 
-    # Características fijas para el modelo
+    # Definir las características que utilizaremos
     features_options = ['precipitation', 'wind', 'humidity', 'visibility'] # Características seleccionadas
-    selected_features = features_options  # Usamos estas características siempre
 
     # Preparar los datos con las características seleccionadas
-    X_train, X_test, y_train, y_test, scaler = preparar_datos(df_valores, selected_features)
+    X_train, y_train = preparar_datos(df_valores, features_options)
 
-    # Entrenar el modelo
+    # Entrenar el modelo y buscar los mejores hiperparámetros
     best_model = optimizar_y_entrenar(X_train, y_train)
 
     # Guardar el modelo entrenado

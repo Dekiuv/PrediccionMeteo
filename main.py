@@ -1,4 +1,4 @@
-import os
+# Importamos todas las librerías necesarias
 import streamlit as st
 import pandas as pd
 import sqlite3
@@ -8,7 +8,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.metrics import accuracy_score, precision_score, recall_score, r2_score, f1_score, mean_absolute_error, mean_squared_error
 import joblib
 
-# Configurar la página de Streamlit
+# Configuración basica de la página de Streamlit
 st.set_page_config(
     page_title="Simulador Meteorológico",
     page_icon="🌤️",
@@ -32,11 +32,11 @@ def cargar_datos():
     connection.close()
     return df_valores
 
-# Función para preparar los datos (igual que en entreno.py)
+# Función para preparar los datos antes de hacer predicciones
 def preparar_datos(df, feature_columns):
 
     X = df[feature_columns]  # Características
-    y = df['weather_id']  # Predecir
+    y = df['weather_id']  # Variable objetivo
 
     # Dividir los datos
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
@@ -59,21 +59,22 @@ best_model = cargar_modelo(modelo_guardado)
 # Cargar los datos
 df_valores = cargar_datos()
 
-# Características fijas para el modelo
-features_options = ['precipitation', 'wind', 'humidity', 'visibility'] # Características disponibles para el modelo
+# Características seleccionadas para el modelo
+features_options = ['precipitation', 'wind', 'humidity', 'visibility'] # Variables de entrada
 
 # Preparar los datos con las características seleccionadas
 X_train, X_test, y_train, y_test, scaler = preparar_datos(df_valores, features_options)
 
 # Configuración de la aplicación Streamlit
 st.title("Simulador Meteorológico - Grupo 3")
-st.write("Esta aplicación permite predecir las condiciones meteorológicas basándose en los datos ingresados.")
+st.write("Porfavor, introduzca los valores para realizar la predicción del clima.")
 
-# Dividir la página en dos columnas
+# Dividir la página en dos columnas para mostrar el formulario y el resultado
 col1, col2 = st.columns(2)
 
 # Columna 1: Formulario de entrada
 with col1:
+    # Campos de entrada del formulario
     precipitation = st.number_input('Precipitación (mm)', min_value=0.0, max_value=500.0, value=0.0, step=0.1)
     wind = st.number_input('Viento (km/h)', min_value=0.0, max_value=150.0, value=10.0, step=0.1)
     humidity = st.number_input('Humedad (%)', min_value=0, max_value=100, value=60, step=1)
