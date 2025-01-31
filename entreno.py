@@ -18,10 +18,10 @@ def cargar_datos():
     return df_valores
 
 # Función para preparar los datos
-def preparar_datos(df, feature_columns):
+def preparar_datos(df):
 
     # Seleccionar las características (X) y la variable objetivo (y)
-    X = df[feature_columns]  # Variables independientes (características seleccionadas)
+    X = df['precipitation', 'wind', 'humidity', 'visibility']  # Variables independientes (características seleccionadas)
     y = df['weather_id']  # Variable a predecir (columna objetivo)
 
     # Dividir los datos en conjuntos de entrenamiento y prueba

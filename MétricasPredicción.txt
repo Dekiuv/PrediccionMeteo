@@ -45,7 +45,7 @@ Parametros 5:
     - Gamma: 0.1
     - Kernel: linear
     - Class_weight: Diccionario personalizado
-    - Tiempo: 2484 + 2538 + 2592 segundos
+    - Tiempo: 7614 segundos
 ---------------------------------------------------
 Parametros 6:
     - C: 1
@@ -80,14 +80,14 @@ Parametros 10:
     - Gamma: 1
     - Kernel: poly
     - Class_weight: Diccionario personalizado
-    - Tiempo: 145 + 180 segundos
+    - Tiempo: 325 segundos
 ---------------------------------------------------
 Parametros 11:
     - C: 100
     - Gamma: 0.1
     - Kernel: poly
     - Class_weight: Diccionario personalizado
-    - Tiempo: 32.55 + 35.1 segundos
+    - Tiempo: 67.65 segundos
 ---------------------------------------------------
 Parametros 12:
     - C: 0.1
